@@ -1,0 +1,1 @@
+forge script DeployMultiPaymaster -s "deployCounterSelectedChains(uint256, uint8[] calldata, uint8)" 88 "[0,1,2,3]" 0 --force --broadcast --via-ir

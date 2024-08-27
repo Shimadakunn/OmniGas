@@ -1,0 +1,45 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+Omnigas/node_modules
+Omnigas/.pnp
+Omnigas/.pnp.js
+Omnigas/.yarn/install-state.gz
+
+# testing
+Omnigas/coverage
+
+# next.js
+Omnigas/.next/
+Omnigas/out/
+
+# production
+Omnigas/build
+
+# misc
+Omnigas/.DS_Store
+Omnigas/*.pem
+
+# debug
+Omnigas/npm-debug.log*
+Omnigas/yarn-debug.log*
+Omnigas/yarn-error.log*
+
+# local env files
+Omnigas/.env*.local
+
+# vercel
+Omnigas/.vercel
+
+# typescript
+Omnigas/*.tsbuildinfo
+Omnigas/next-env.d.ts
+
+# Foundry
+contracts/cache/
+contracts/out/
+contracts/broadcast/
+contracts/lib/
+
+# Dotenv file
+contracts/.env
