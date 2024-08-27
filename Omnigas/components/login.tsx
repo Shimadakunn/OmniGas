@@ -51,7 +51,7 @@ const Login = () => {
   return (
     <div className="w-full h-full flex items-center justify-center relative">
       <div className="flex flex-col items-center justify-center space-y-2 z-10">
-        <div className="text-4xl font-black font-[Gaeil]">Your Account</div>
+        <div className="text-4xl font-bold">Access to your Account</div>
         {isLoading && <Spinner />}
 
         {!isLoading && (
@@ -82,7 +82,9 @@ const Login = () => {
                 <Button>CREATE</Button>
               </div>
             )}
-            {!createForm && <Button className="w-[10vw]">LOG IN</Button>}
+            {!createForm && (
+              <Button className="w-[10vw] rounded-xl">LOG IN</Button>
+            )}
           </form>
         )}
       </div>

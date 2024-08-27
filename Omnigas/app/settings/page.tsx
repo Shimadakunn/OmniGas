@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import Image from "next/image";
 
 import { useMe } from "@/providers/MeProvider";
@@ -25,7 +24,6 @@ const Settings = () => {
   const { sessions } = useWalletConnect();
   const [isCopied, setIsCopied] = useState(false);
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
 
   return (
     <div className="w-full h-full flex justify-start flex-col p-4 space-y-8">
