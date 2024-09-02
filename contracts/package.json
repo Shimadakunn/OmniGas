@@ -1,0 +1,21 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "description": "## Entry Point Address ``` 0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789 ```",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@layerzerolabs/lz-evm-oapp-v2": "^2.3.39",
+    "@layerzerolabs/lz-evm-protocol-v2": "^2.3.39",
+    "@openzeppelin/contracts": "^5.0.2",
+    "solidity-bytes-utils": "^0.8.2"
+  }
+}

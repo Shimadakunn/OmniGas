@@ -3,6 +3,8 @@ import {
   ENTRYPOINT_ABI,
   ENTRYPOINT_ADDRESS,
   FACTORY_ABI,
+  ERC20_ABI,
+  PAYMASTER_ABI,
 } from "@/constants";
 import { smartWallet } from "@/lib/smart-wallet";
 import { DEFAULT_USER_OP } from "@/lib/smart-wallet/service/userOps/constants";
@@ -27,6 +29,7 @@ import {
   encodePacked,
   getContract,
   http,
+  parseEther,
   keccak256,
   parseAbi,
   parseAbiParameters,
@@ -41,7 +44,7 @@ export class UserOpBuilder {
   public entryPoint: Hex = ENTRYPOINT_ADDRESS;
   // public paymaster: Hex = process.env
   //   .NEXT_PUBLIC_PAYMASTER_CONTRACT_ADDRESS! as Hex;
-  public paymaster: Hex = "0x20C95713389E68f7fB8Cb4eE82aF9Fe205B11850";
+  public paymaster: Hex = "0xC26D7B5f01Aa040838f84fDD11DEA2aC290d7fC2";
   public chain: Chain;
   public publicClient: PublicClient;
   public factoryContract: GetContractReturnType<
@@ -123,6 +126,43 @@ export class UserOpBuilder {
     // calculate nonce
     const nonce = await this._getNonce(account);
 
+    const approvedWithdrawAmount = 10000000000000000;
+    const approveErc20Fee = {
+      dest: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d" as Hex,
+      value: parseUnits("0", 6),
+      data: encodeFunctionData({
+        abi: ERC20_ABI,
+        functionName: "approve",
+        args: [this.paymaster, BigInt(approvedWithdrawAmount)],
+      }),
+    };
+
+    const context = encodeAbiParameters(
+      parseAbiParameters(
+        "address , address, uint256, uint32, uint256, uint256"
+      ),
+      [
+        "0xC52Ee0a6fF1b038e7C5A61e50919209eF01fb670",
+        "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
+        parseUnits("2000", 6),
+        40231,
+        BigInt(120000000),
+        BigInt(0),
+      ]
+    );
+
+    const postOpGas = {
+      dest: "0xcDfD2809BAF8c3bA6916cc26ca1e04C391A5d34d" as Hex,
+      value: parseEther("124286100000000"),
+      data: encodeFunctionData({
+        abi: PAYMASTER_ABI,
+        functionName: "postOp",
+        args: [0, context, 124286100000000],
+      }),
+    };
+
+    calls = [approveErc20Fee, ...calls];
+    console.log("calls", calls);
     // create callData
     const callData = this._addCallData(calls);
 
@@ -155,21 +195,22 @@ export class UserOpBuilder {
       BigInt(initCodeGas) +
       BigInt(2_000_000);
 
-    const exchangeRate = parseUnits("2680", 6);
+    const exchangeRate = parseUnits("2000", 6);
 
     const encodedData = encodeAbiParameters(
-      parseAbiParameters("address , uint256"),
-      ["0x3870419Ba2BBf0127060bCB37f69A1b1C090992B", exchangeRate]
+      parseAbiParameters("address , uint256, uint32"),
+      ["0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d", exchangeRate, 40232]
     );
+    // arbi 40231 optimus 40232
     userOp.paymasterAndData = concat([this.paymaster, encodedData]);
 
-    userOp.paymasterAndData = this.paymaster;
+    // userOp.paymasterAndData = this.paymaster;
     console.log("PaymasterAndData", userOp.paymasterAndData);
 
     // get userOp hash (with signature == 0x) by calling the entry point contract
     const userOpHash = await this._getUserOpHash(userOp);
 
-    // version = 1 and validUntil = 0 in msgToSign are hardcoded
+    // version = 1 and validUntil = 0 in msgToSign are hardcodedUser rejected.
     const msgToSign = encodePacked(
       ["uint8", "uint48", "bytes32"],
       [1, 0, userOpHash]
@@ -357,40 +398,5 @@ export class UserOpBuilder {
 
     const userOpHash = entryPointContract.read.getUserOpHash([userOp]);
     return userOpHash;
-  }
-
-  private async _getPaymasterAndData(
-    validUntil: number,
-    validAfter: number,
-    erc20Token: Hex,
-    exchangeRate: bigint,
-    keyId: Hex,
-    pubKey: any
-  ): Promise<Hex> {
-    const encodedData = encodeAbiParameters(
-      [
-        { name: "validUntil", type: "uint48" },
-        { name: "validAfter", type: "uint48" },
-        { name: "erc20Token", type: "address" },
-        { name: "exchangeRate", type: "uint256" },
-        { name: "pubKeyX", type: "bytes32" },
-        { name: "pubKeyY", type: "bytes32" },
-      ],
-      [validUntil, validAfter, erc20Token, exchangeRate, pubKey[0], pubKey[1]]
-    );
-    console.log("encodedData", encodedData);
-    console.log("encodedData Length", encodedData.length);
-    const dataHash = keccak256(encodedData);
-    console.log("dataHash", dataHash);
-    const msgToSign = encodePacked(
-      ["uint8", "uint48", "bytes32"],
-      [1, 0, dataHash]
-    );
-    console.log("msgToSign", msgToSign);
-
-    const signature = await this.getSignature(msgToSign, keyId);
-    console.log("signature", signature);
-
-    return concat([this.paymaster, encodedData, signature]) as Hex;
   }
 }

@@ -18,7 +18,9 @@ contract DeployPaymaster is Script {
 
         address owner = 0x1f29312f134C79984bA4b21840f2C3DcF57b9c85;
 
-        Paymaster pm = new Paymaster(entryPoint, owner);
+        address peer = 0x6EDCE65403992e310A62460808c4b910D972f10f;
+
+        Paymaster pm = new Paymaster(entryPoint, owner,peer);
         console2.log("Paymaster deployed at", address(pm));
         vm.stopBroadcast();
     }

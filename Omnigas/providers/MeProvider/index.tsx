@@ -6,8 +6,8 @@ import { WebAuthn } from "@/lib/web-authn/service/web-authn";
 import { saveUser } from "@/lib/factory";
 import { getUser } from "@/lib/factory/getUser";
 import { walletConnect } from "@/lib/wallet-connect/service/wallet-connect";
-import { Chain,arbitrumSepolia } from "viem/chains";
-import { chains } from "@/constants/chains";
+import { Chain } from "viem/chains";
+import { TokenType, tokens } from "@/constants";
 
 export type Me = {
   account: Address;
@@ -24,6 +24,7 @@ function useMeHook() {
   const [isReturning, setIsReturning] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [chain, switchChain] = useState<Chain | undefined>();
+  const [feeToken, switchToken] = useState<string | undefined>();
 
   function disconnect() {
     localStorage.removeItem("passkeys4337.me");
@@ -33,7 +34,7 @@ function useMeHook() {
   async function create(username: string) {
     console.log("creating user", username);
     setIsLoading(true);
-    
+
     try {
       console.log("WebAuthn signature...");
       const credential = await WebAuthn.create({ username });
@@ -67,6 +68,11 @@ function useMeHook() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function switchFeeToken(token: string) {
+    localStorage.setItem("passkeys4337.feeToken", token);
+    switchToken(token);
   }
 
   async function get() {
@@ -105,9 +111,11 @@ function useMeHook() {
   useEffect(() => {
     const me = localStorage.getItem("passkeys4337.me");
     const returning = localStorage.getItem("passkeys4337.returning");
+    const feeToken = localStorage.getItem("passkeys4337.feeToken");
     if (me) {
       try {
         setMe(JSON.parse(me));
+        switchToken(feeToken!);
       } catch (e) {
         console.log("error while parsing me");
       }
@@ -128,6 +136,8 @@ function useMeHook() {
     disconnect,
     chain,
     switchChain,
+    feeToken,
+    switchFeeToken,
   };
 }
 
@@ -145,7 +155,5 @@ export const useMe = (): UseMeHook => {
 export function MeProvider({ children }: { children: React.ReactNode }) {
   const hook = useMeHook();
 
-  return (<MeContext.Provider value={hook}>
-    {children}
-  </MeContext.Provider>);
+  return <MeContext.Provider value={hook}>{children}</MeContext.Provider>;
 }

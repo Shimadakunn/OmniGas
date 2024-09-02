@@ -40,6 +40,7 @@ contracts/cache/
 contracts/out/
 contracts/broadcast/
 contracts/lib/
+contracts/node_modules/
 
 # Dotenv file
 contracts/.env

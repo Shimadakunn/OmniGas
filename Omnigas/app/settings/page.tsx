@@ -55,7 +55,7 @@ const Settings = () => {
           LOG OUT
         </Button>
       </div>
-      <Separator />
+      <Separator className="border" />
       <h2>Wallet Connect</h2>
       {(!sessions || Object.values(sessions).length < 1) && (
         <h1>No active dApp sessions</h1>
@@ -87,7 +87,7 @@ function SessionCard({ wcReactSession }: IProps) {
   const topic = session.topic;
   const { name, icons, url } = session.peer.metadata;
   return (
-    <div className="w-full flex items-center justify-between bg-primary/5 p-4 rounded-xl">
+    <div className="w-full mx-auto flex items-center justify-between bg-main border-2 border-black p-4 pr-6">
       <div className="flex items-center justify-center space-x-2">
         {icons && (
           <img
@@ -111,15 +111,15 @@ function SessionCard({ wcReactSession }: IProps) {
         </div>
       </div>
       <Button
-        variant={"outline"}
         size={"icon"}
+        className="rounded-full bg-[#DBCAF4]"
         disabled={wcReactSession.disconnectIsLoading}
         onClick={() => disconnectSession(topic)}
       >
         {wcReactSession.disconnectIsLoading ? (
           <Spinner style={{ width: 16, height: 16 }} color="var(--gray-a8)" />
         ) : (
-          <Unplug />
+          <Unplug size={20} />
         )}
       </Button>
     </div>

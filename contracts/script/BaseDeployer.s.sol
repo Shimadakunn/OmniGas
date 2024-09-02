@@ -16,8 +16,6 @@ contract BaseDeployer is Script {
         Sepolia,
         ArbitrumSepolia,
         OptimismSepolia,
-        LiskSepolia,
-        XrplSepolia,
         Etherum,
         Arbitrum,
         Optimism
@@ -60,8 +58,6 @@ contract BaseDeployer is Script {
         forks[Chains.Sepolia] = vm.envString("SEPOLIA_RPC_URL");
         forks[Chains.ArbitrumSepolia] = vm.envString("ARBITRUM_SEPOLIA_RPC_URL");
         forks[Chains.OptimismSepolia] = vm.envString("OPTIMISM_SEPOLIA_RPC_URL");
-        forks[Chains.LiskSepolia] = vm.envString("LISK_SEPOLIA_RPC_URL");
-        forks[Chains.XrplSepolia] = vm.envString("XRPL_RPC_URL");
 
         // Mainnet
         forks[Chains.Etherum] = "etherum";

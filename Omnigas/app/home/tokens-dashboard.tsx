@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <ScrollArea className="h-[50vh] w-full">
-      <div className="w-full h-full flex items-center justify-start flex-col space-y-1 px-4">
+      <div className="w-full h-full flex items-center justify-start flex-col space-y-2 px-2">
         {Object.keys(tokens)
           .sort(
             (a, b) =>
@@ -38,7 +38,7 @@ export default function Home() {
                 chain === undefined) && (
                 <div
                   key={key}
-                  className="w-full h-16 flex items-center justify-between p-8 bg-secondary/15 hover:bg-secondary/20 cursor-pointer active:bg-secondary/20 transition-all duration-200 ease-in-out rounded-3xl"
+                  className="w-[50%] h-20 flex items-center justify-between px-4 bg-main hover:bg-white/80 border-2  cursor-pointer active:bg-background transition-all duration-200 ease-in-out"
                   onClick={() => {
                     router.push("/token?token=" + key);
                   }}
@@ -49,16 +49,16 @@ export default function Home() {
                         src={`/tokens-icons/${tokens[
                           key
                         ].coin.toLowerCase()}.svg`}
-                        width={30}
-                        height={30}
+                        width={35}
+                        height={35}
                         alt={tokens[key].coin}
                       />
                       <Image
                         src={`/chains-icons/${
                           chains[tokens[key].network].viem.name
                         }.svg`}
-                        width={20}
-                        height={20}
+                        width={22}
+                        height={22}
                         alt={tokens[key].coin}
                         className="absolute bottom-0 left-0 transform -translate-x-1/4 translate-y-1/4"
                       />
@@ -66,15 +66,15 @@ export default function Home() {
                     <h1 className="text-lg">{tokens[key].name}</h1>
                   </div>
                   <div className="flex items-center">
-                    <h1 className="text-2xl">
+                    <h1 className="text-2xl ">
                       {formatBalance(tokens[key].balance!)?.split(".")[0]}
                     </h1>
-                    <h1 className="text-xs items-start pt-2 text-primary/80">
+                    <h1 className="text-lg items-start pt-1 ">
                       {formatBalance(tokens[key].balance!)?.split(".")[1] &&
                         "." +
                           formatBalance(tokens[key].balance!)!.split(".")[1]}
                     </h1>
-                    <h1 className="text-card text-sm ml-1">
+                    <h1 className="text-sm ml-1 w-10 text-center">
                       {tokens[key].coin}
                     </h1>
                   </div>

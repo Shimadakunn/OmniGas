@@ -28,7 +28,8 @@ contract DeployMultiPaymaster is Script, BaseDeployer {
                         type(Paymaster).creationCode,
                         abi.encode(
                             address(entryPoint),
-                            address(this)
+                            address(this),
+                            0x6EDCE65403992e310A62460808c4b910D972f10f
                         )
                     )
                 )
@@ -47,8 +48,6 @@ contract DeployMultiPaymaster is Script, BaseDeployer {
         deployForks[0] = Chains.Sepolia;
         deployForks[1] = Chains.ArbitrumSepolia;
         deployForks[2] = Chains.OptimismSepolia;
-        deployForks[3] = Chains.LiskSepolia;
-        deployForks[4] = Chains.XrplSepolia;
 
         createDeployMultichain(deployForks);
     }
@@ -93,7 +92,7 @@ contract DeployMultiPaymaster is Script, BaseDeployer {
             0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789
         );
         
-        Paymaster pm = new Paymaster{salt: counterSalt}(entryPoint, address(this));
+        Paymaster pm = new Paymaster{salt: counterSalt}(entryPoint, address(this), 0x6EDCE65403992e310A62460808c4b910D972f10f);
 
         require(create2addrCounter == address(pm), "Address mismatch SimplePaymaster ");
 

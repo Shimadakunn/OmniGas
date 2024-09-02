@@ -8,10 +8,12 @@ import { truncate } from "@/utils/truncate";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Modal from "@/components/ui/modal";
 
 import { CircleCheckBig, Scan } from "lucide-react";
 
 const WalletConnect = () => {
+  const [isModalActive, setIsModalActive] = useState(false);
   const [input, setInput] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -20,8 +22,8 @@ const WalletConnect = () => {
   const [wcReactSession, setWcReactSession] = useState<IWCReactSession | null>(
     null
   );
+
   const { pairSession, pairingStates, sessions } = useWalletConnect();
-  const [isOpen, setIsOpen] = useState(false);
 
   function handlePair(data: string | null) {
     if (data?.startsWith("wc:")) {
@@ -49,13 +51,9 @@ const WalletConnect = () => {
     }
   }
 
-  function handleScan(data: string | null) {
-    if (data) {
-      handlePair(data);
-      if (data.startsWith("0x")) {
-        console.log("TODO: handle ethereum address");
-      }
-    }
+  let name, icons, url: any;
+  if (success && wcReactSession) {
+    ({ name, icons, url } = wcReactSession.session.peer.metadata);
   }
 
   useEffect(() => {
@@ -73,6 +71,12 @@ const WalletConnect = () => {
     }
   }, [sessions, pairingTopic, pairingStates]);
 
+  useEffect(() => {
+    if (!isModalActive) {
+      resetState();
+    }
+  }, [isModalActive]);
+
   const resetState = () => {
     setInput("");
     setSuccess(false);
@@ -82,28 +86,24 @@ const WalletConnect = () => {
     setWcReactSession(null);
   };
 
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (!open) {
-      resetState();
-    }
-  };
-
-  let name, icons, url: any;
-  if (success && wcReactSession) {
-    ({ name, icons, url } = wcReactSession.session.peer.metadata);
-  }
-
   return (
-    <Drawer open={isOpen} onOpenChange={handleOpenChange}>
-      <DrawerTrigger>
-        <Button size={"icon"} className="rounded-full">
-          <Scan className="" />
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent className="py-5 px-4 max-w-[600px]">
+    <>
+      <Button
+        onClick={() => {
+          setIsModalActive(true);
+        }}
+        size={"icon"}
+        className="rounded-full"
+      >
+        <Scan className="" />
+      </Button>
+      <Modal
+        active={isModalActive}
+        setActive={setIsModalActive}
+        className="w-[30vw] space-y-2 bg-mainAccent rounded-xl"
+      >
         {success && wcReactSession && (
-          <div className="w-full flex items-center justify-center space-y-4 flex-col h-[60vh]">
+          <>
             {icons && (
               <img
                 src={icons[0]}
@@ -115,55 +115,41 @@ const WalletConnect = () => {
             <h1 className="text-2xl font-bold text-center">{name}</h1>
             <Button
               variant={"link"}
-              size={"link"}
               onClick={() => {
                 window.open(url, "_blank");
               }}
             >
               {truncate(url?.split("https://")[1] ?? "Unknown", 23)}
             </Button>
-            <CircleCheckBig />
-          </div>
+            <CircleCheckBig color="#DBCAF4" />
+          </>
         )}
-        {isLoading && (
-          <div className="w-full flex items-center justify-center h-[60vh]">
-            <Spinner />
-          </div>
-        )}
+        {isLoading && <Spinner />}
         {!isLoading && !success && !error && !wcReactSession && (
-          <div className="flex items-center justify-center space-y-4 flex-col mt-4 h-[60vh]">
-            <ReactQrReader
-              style={{
-                borderRadius: " 10px",
-                width: "100%",
-                overflow: "hidden",
-                background: "var(--gray-5)",
-              }}
-              showViewFinder={false}
-              onError={(err) => console.error(err)}
-              onScan={handleScan}
-            />
-
-            <div className="w-full flex items-center justify-center flex-row">
+          <>
+            <p className="text-2xl pb-2">Connect to a Dapp</p>
+            <div className="flex w-full space-x-4 items-center justify-center my-auto">
               <Input
+                className="w-[15vw] rounded-none"
                 placeholder="wc:…"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="text-sm mr-2"
-              />
+              ></Input>
               <Button
+                variant="reverse"
                 onClick={() => {
                   setError(null);
                   handlePair(input);
                 }}
+                className="bg-[#DBCAF4]"
               >
                 {isLoading ? "is connecting" : "Connect"}
               </Button>
             </div>
-          </div>
+          </>
         )}
-      </DrawerContent>
-    </Drawer>
+      </Modal>
+    </>
   );
 };
 

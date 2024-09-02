@@ -75,7 +75,10 @@ export function BalanceProvider({ children }: { children: React.ReactNode }) {
     <BalanceContext.Provider value={hook}>
       {!isMounted ? null : me ? (
         // <Login />
-        <div className="h-full flex items-center justify-between flex-col">
+        <div
+          className="h-full flex items-center justify-between flex-col"
+          id="modal"
+        >
           <Header />
           {children}
           <Footer />

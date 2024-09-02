@@ -82,20 +82,20 @@ function SupplyEthAave(
   me: Me,
   amount: string
 ) {
-  console.log("Erc20 fee");
-  const paymasterContract = "0x20C95713389E68f7fB8Cb4eE82aF9Fe205B11850";
-  const approvedWithdrawAmount = 10000000000000000;
-  const approveErc20Fee = {
-    dest: "0x3870419Ba2BBf0127060bCB37f69A1b1C090992B" as Hex,
-    value: parseUnits("0", 6),
-    data: encodeFunctionData({
-      abi: ERC20_ABI,
-      functionName: "approve",
-      args: [paymasterContract, BigInt(approvedWithdrawAmount)],
-    }),
-  };
+  // const paymasterContract = "0x20C95713389E68f7fB8Cb4eE82aF9Fe205B11850";
+  // const approvedWithdrawAmount = 10000000000000000;
+  // const approveErc20Fee = {
+  //   dest: "0x5fd84259d66Cd46123540766Be93DFE6D43130D7" as Hex,
+  //   value: parseUnits("0", 6),
+  //   data: encodeFunctionData({
+  //     abi: ERC20_ABI,
+  //     functionName: "approve",
+  //     args: [paymasterContract, BigInt(approvedWithdrawAmount)],
+  //   }),
+  // };
+
   const calls = [
-    approveErc20Fee,
+    // approveErc20Fee,
     {
       dest: contract.address as Hex,
       value: parseEther(amount),

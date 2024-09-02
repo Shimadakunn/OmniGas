@@ -65,6 +65,12 @@ const config = {
         darkBg: "#272933",
         darkText: "#eeefe9",
         darkBorder: "#000",
+
+        vertClair: "#C6FCDB",
+        bleuClair: "#BFEFE3",
+        rose: "#FBC3DB",
+        violetFonce: "#85A1E5",
+        violetClair: "#DBCAF4",
       },
       borderRadius: {
         lg: "var(--radius)",
