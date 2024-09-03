@@ -112,12 +112,15 @@ const WalletConnect = () => {
                 style={{ borderRadius: "10px" }}
               />
             )}
-            <h1 className="text-2xl font-bold text-center">{name}</h1>
+            <h1 className="text-2xl font-bold text-center text-white">
+              {name}
+            </h1>
             <Button
               variant={"link"}
               onClick={() => {
                 window.open(url, "_blank");
               }}
+              className="text-white"
             >
               {truncate(url?.split("https://")[1] ?? "Unknown", 23)}
             </Button>

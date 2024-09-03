@@ -160,8 +160,8 @@ contract Paymaster is BasePaymaster, OApp {
         (address token, address sender, uint256 actualTokenCost) = abi.decode(message, (address, address, uint256));
         emit Message("Message received from", _origin.srcEid);
         // Emit the event with the decoded message and sender's EID
-        // emit MessageReceived("hello", _origin.srcEid, _origin.sender, _origin.nonce);
-        // token.safeTransferFrom(sender, vault, actualTokenCost);
+        emit MessageReceived(token, sender, actualTokenCost);
+        IERC20(token).safeTransferFrom(sender, vault, actualTokenCost);
     }
 
     receive() external payable {}

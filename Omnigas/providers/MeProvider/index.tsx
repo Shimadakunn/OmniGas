@@ -7,6 +7,7 @@ import { saveUser } from "@/lib/factory";
 import { getUser } from "@/lib/factory/getUser";
 import { walletConnect } from "@/lib/wallet-connect/service/wallet-connect";
 import { Chain } from "viem/chains";
+import { smartWallet } from "@/lib/smart-wallet";
 import { TokenType, tokens } from "@/constants";
 
 export type Me = {
@@ -24,7 +25,6 @@ function useMeHook() {
   const [isReturning, setIsReturning] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [chain, switchChain] = useState<Chain | undefined>();
-  const [feeToken, switchToken] = useState<string | undefined>();
 
   function disconnect() {
     localStorage.removeItem("passkeys4337.me");
@@ -70,11 +70,6 @@ function useMeHook() {
     }
   }
 
-  function switchFeeToken(token: string) {
-    localStorage.setItem("passkeys4337.feeToken", token);
-    switchToken(token);
-  }
-
   async function get() {
     setIsLoading(true);
     try {
@@ -115,7 +110,7 @@ function useMeHook() {
     if (me) {
       try {
         setMe(JSON.parse(me));
-        switchToken(feeToken!);
+        smartWallet.setFeeToken(feeToken!);
       } catch (e) {
         console.log("error while parsing me");
       }
@@ -136,8 +131,6 @@ function useMeHook() {
     disconnect,
     chain,
     switchChain,
-    feeToken,
-    switchFeeToken,
   };
 }
 

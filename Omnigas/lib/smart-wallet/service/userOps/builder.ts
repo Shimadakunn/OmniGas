@@ -3,8 +3,8 @@ import {
   ENTRYPOINT_ABI,
   ENTRYPOINT_ADDRESS,
   FACTORY_ABI,
-  ERC20_ABI,
-  PAYMASTER_ABI,
+  chains,
+  tokens,
 } from "@/constants";
 import { smartWallet } from "@/lib/smart-wallet";
 import { DEFAULT_USER_OP } from "@/lib/smart-wallet/service/userOps/constants";
@@ -44,7 +44,7 @@ export class UserOpBuilder {
   public entryPoint: Hex = ENTRYPOINT_ADDRESS;
   // public paymaster: Hex = process.env
   //   .NEXT_PUBLIC_PAYMASTER_CONTRACT_ADDRESS! as Hex;
-  public paymaster: Hex = "0xC26D7B5f01Aa040838f84fDD11DEA2aC290d7fC2";
+  public paymaster: Hex = "0xEF6E85cB39ae9c4df32b8aC6937C342540C06a92";
   public chain: Chain;
   public publicClient: PublicClient;
   public factoryContract: GetContractReturnType<
@@ -126,42 +126,7 @@ export class UserOpBuilder {
     // calculate nonce
     const nonce = await this._getNonce(account);
 
-    const approvedWithdrawAmount = 10000000000000000;
-    const approveErc20Fee = {
-      dest: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d" as Hex,
-      value: parseUnits("0", 6),
-      data: encodeFunctionData({
-        abi: ERC20_ABI,
-        functionName: "approve",
-        args: [this.paymaster, BigInt(approvedWithdrawAmount)],
-      }),
-    };
-
-    const context = encodeAbiParameters(
-      parseAbiParameters(
-        "address , address, uint256, uint32, uint256, uint256"
-      ),
-      [
-        "0xC52Ee0a6fF1b038e7C5A61e50919209eF01fb670",
-        "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
-        parseUnits("2000", 6),
-        40231,
-        BigInt(120000000),
-        BigInt(0),
-      ]
-    );
-
-    const postOpGas = {
-      dest: "0xcDfD2809BAF8c3bA6916cc26ca1e04C391A5d34d" as Hex,
-      value: parseEther("124286100000000"),
-      data: encodeFunctionData({
-        abi: PAYMASTER_ABI,
-        functionName: "postOp",
-        args: [0, context, 124286100000000],
-      }),
-    };
-
-    calls = [approveErc20Fee, ...calls];
+    calls = [...calls];
     console.log("calls", calls);
     // create callData
     const callData = this._addCallData(calls);
@@ -195,16 +160,48 @@ export class UserOpBuilder {
       BigInt(initCodeGas) +
       BigInt(2_000_000);
 
-    const exchangeRate = parseUnits("2000", 6);
-
-    const encodedData = encodeAbiParameters(
-      parseAbiParameters("address , uint256, uint32"),
-      ["0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d", exchangeRate, 40232]
+    const chain = Object.entries(chains).find(
+      ([_, chainType]) => chainType.viem === this.chain
     );
-    // arbi 40231 optimus 40232
-    userOp.paymasterAndData = concat([this.paymaster, encodedData]);
+    const [chainKey, chainValue] = chain!;
+    console.log("feeMode", smartWallet.feeToken);
+    if (smartWallet.feeToken === "full") {
+      console.log("full", chainValue.paymaster);
+      userOp.paymasterAndData = chainValue.paymaster;
+    } else if (smartWallet.feeToken !== "eth") {
+      console.log(
+        "rate",
+        Number(
+          parseFloat(tokens["eth-arbitrumSepolia"].rate!).toFixed(0)
+        ).toString()
+      );
+      console.log("decimals", tokens[smartWallet.feeToken].decimals!);
+      console.log("balance", tokens[smartWallet.feeToken].balance);
+      const exchangeRate = parseUnits(
+        Number(
+          parseFloat(tokens["eth-arbitrumSepolia"].rate!).toFixed(0)
+        ).toString(),
+        6
+      );
 
-    // userOp.paymasterAndData = this.paymaster;
+      const encodedData = encodeAbiParameters(
+        parseAbiParameters("address , uint256, uint32"),
+        [
+          tokens[smartWallet.feeToken].address as Hex,
+          exchangeRate,
+          chains[tokens[smartWallet.feeToken].network].eId,
+        ]
+      );
+      console.log(
+        "Usdc",
+        exchangeRate,
+        tokens[smartWallet.feeToken].address,
+        chains[tokens[smartWallet.feeToken].network].eId,
+        chainValue.paymaster
+      );
+      userOp.paymasterAndData = concat([chainValue.paymaster, encodedData]);
+    }
+
     console.log("PaymasterAndData", userOp.paymasterAndData);
 
     // get userOp hash (with signature == 0x) by calling the entry point contract

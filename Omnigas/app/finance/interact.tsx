@@ -342,7 +342,7 @@ const Finance = () => {
                               Interact with
                             </div>
                             <Input
-                              className="h-[12vh] w-[80vw] text-4xl"
+                              className="h-[12vh] w-[30vw] text-4xl"
                               placeholder="0"
                               type="number"
                               value={userInputAmount}

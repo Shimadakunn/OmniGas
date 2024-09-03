@@ -6,6 +6,7 @@ export type TokenType = {
   balance?: string;
   decimals?: number;
   rate?: string;
+  allowance?: string;
   aave?: string;
   aavebalance?: string;
 };

@@ -11,6 +11,7 @@ import Logo from "@/public/logo.svg";
 
 import WalletConnect from "./wallet-connect";
 import CryptoSelector from "./crypto-selector";
+import GasAllowance from "./gas-allowance";
 
 const Header = () => {
   const router = useRouter();
@@ -43,6 +44,7 @@ const Header = () => {
         <div className=" text-[56px]">OmniGas</div>
       </div>
       <div className="space-x-4 flex">
+        <GasAllowance />
         <CryptoSelector />
         <WalletConnect />
         <Button

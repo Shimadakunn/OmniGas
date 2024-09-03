@@ -1,4 +1,3 @@
-import { CHAIN } from "@/constants";
 import { EstimateUserOperationGasReturnType } from "@/lib/smart-wallet/service/actions";
 import {
   ERC4337RpcSchema,
@@ -46,6 +45,7 @@ export const createSmartWalletClient = (
 class SmartWallet {
   private _client: SmartWalletClient;
   private _isInitiated: boolean = true;
+  public feeToken: string = "";
 
   constructor() {
     this._client = createSmartWalletClient({
@@ -54,6 +54,11 @@ class SmartWallet {
         `https://public.api.stackup.sh/v1/node/${process.env.NEXT_PUBLIC_STACKUP_BUNDLER_API_KEY}`
       ),
     });
+  }
+
+  public setFeeToken(token: string) {
+    localStorage.setItem("passkeys4337.feeToken", token);
+    this.feeToken = token;
   }
 
   public init(chain: ChainType) {

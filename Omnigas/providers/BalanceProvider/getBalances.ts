@@ -62,8 +62,15 @@ export async function getBalance(
       abi: ERC20_ABI,
       functionName: "decimals",
     });
+    const allowance = await client.readContract({
+      address: tokens[tok].address as Hex,
+      abi: ERC20_ABI,
+      functionName: "allowance",
+      args: [address, chains[tokens[tok].network].paymaster],
+    });
     tokens[tok].balance = formatUnits(balance, decimals);
     tokens[tok].decimals = decimals;
+    tokens[tok].allowance = formatUnits(allowance, decimals);
   } else {
     balance = await client.getBalance({ address: address });
     tokens[tok].balance = formatEther(balance);
