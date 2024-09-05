@@ -101,7 +101,6 @@ function SessionCard({ wcReactSession }: IProps) {
           <h1>{name}</h1>
           <Button
             variant={"link"}
-            size={"link"}
             onClick={() => {
               window.open(url, "_blank");
             }}
