@@ -22,7 +22,6 @@ const ChainSelector = () => {
         {Object.keys(chains).map((key) => (
           <Button
             key={key}
-            variant={chain === chains[key].viem ? "secondary" : "outline"}
             onClick={() => switchChain(chains[key].viem)}
             className="px-6 py-2"
           >
