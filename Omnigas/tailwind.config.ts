@@ -71,6 +71,9 @@ const config = {
         rose: "#FBC3DB",
         violetFonce: "#85A1E5",
         violetClair: "#DBCAF4",
+
+        up: "#FBC3DB",
+        down: "#FBC3DB",
       },
       borderRadius: {
         lg: "var(--radius)",

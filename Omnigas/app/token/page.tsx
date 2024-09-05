@@ -2,6 +2,7 @@
 import Image from "next/image";
 import React, { useState, useEffect, SetStateAction, Dispatch } from "react";
 import { useBalance } from "@/providers/BalanceProvider";
+import { useMe } from "@/providers/MeProvider";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   ChartConfig,
@@ -9,10 +10,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
+import { Button } from "@/components/ui/button";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-
-import { chains, tokens } from "@/constants";
+import { tokens, chains, contracts } from "@/constants";
+import { Supply, Withdraw } from "@/lib/functions";
 import {
   roundToNearestMultiple,
   determineStepSize,
@@ -20,8 +23,9 @@ import {
 import { calculateVariation } from "@/utils/calculateVariation";
 import { formatBalance } from "@/utils/formatBalance";
 
-import { TrendingUp, TrendingDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Spinner from "@/components/Spinner";
+import { CircleCheckBig, CircleX, CircleArrowOutUpRight } from "lucide-react";
 
 export type TokenPageProps = {
   token: string;
@@ -46,6 +50,18 @@ export const TokenPage = () => {
   const token = searchParams.get("token") ?? "eth-sepolia";
   const [variation, setVariation] = useState<string>("--.--");
   const [isUp, setIsUp] = useState<boolean | null>(null);
+  const { refreshBalance, balances } = useBalance();
+  const [totalBalanceUSD, setTotalBalanceUSD] = useState<string>("--.--");
+
+  useEffect(() => {
+    const balance =
+      parseFloat(tokens[token].balance!) * parseFloat(tokens[token].rate!);
+    setTotalBalanceUSD(balance.toFixed(2));
+    const interval = setInterval(() => {
+      refreshBalance();
+    }, 50000);
+    return () => clearInterval(interval);
+  }, [balances, refreshBalance, token]);
 
   useEffect(() => {
     if (variation !== "--.--") {
@@ -79,24 +95,21 @@ export const TokenPage = () => {
         </div>
 
         <Separator orientation="vertical" className="h-[75%]" />
-        <div className="text-2xl font-medium w-full text-center">
+        <div className="text-2xl font-medium w-full text-center text-white">
           <div className="flex items-center justify-center">
-            <div className="text-lg text-gray-400 mr-[0.1rem]">$</div>
+            <div className="text-sm text-gray-200 pt-2">$</div>
             {formatBalance(tokens[token]?.rate ?? "") || "--.--"}
           </div>
 
-          <div className="text-xs font-base text-gray-500">
-            {tokens[token].name!} Price
-          </div>
+          <div className="text-xs font-base text-gray-300">Price</div>
         </div>
         <Separator orientation="vertical" className="h-[75%]" />
-        <div className="text-2xl font-medium w-full text-center ">
+        {/* <div className="text-2xl font-medium w-full text-center ">
           <div
             className={`flex items-center justify-center tracking-wide ${
-              isUp ? "text-green-500" : isUp === false ? "text-red-500" : null
+              isUp ? "text-green-400" : isUp === false ? "text-red-400" : null
             }`}
           >
-            {/* {isUp ? "▲" : isUp === false ? "▼" : null} */}
             {isUp ? (
               <TrendingUp className="mr-1" />
             ) : isUp === false ? (
@@ -106,7 +119,24 @@ export const TokenPage = () => {
             {isUp !== null && "%"}
           </div>
 
-          <div className="text-xs font-base text-gray-500">Last 24H Change</div>
+          <div className="text-xs font-base text-gray-300">Last 24H Change</div>
+        </div> */}
+        <div className="text-2xl font-medium w-full text-center text-white">
+          <div className="flex items-center justify-center space-x-2">
+            <div className="">
+              {formatBalance(tokens[token].balance ?? "") || "--.--"}
+              <span className="text-lg text-violetClair">
+                {" " + tokens[token].coin}
+              </span>
+            </div>
+            <Separator orientation="vertical" className="h-5" />
+            <div className="">
+              <span className="text-sm text-violetClair">$</span>
+              {totalBalanceUSD}
+            </div>
+          </div>
+
+          <div className="text-xs font-base text-gray-300">Balance</div>
         </div>
       </div>
       <LineChart token={token} setVariation={setVariation} />
@@ -202,13 +232,7 @@ const LineChart = (props: TokenPageProps) => {
   }, [refreshBalance, balances, token, setVariation]);
 
   return (
-    <div className="w-full">
-      <div className="w-full flex flex-col items-center justify-center mb-2">
-        <div className="text-base text-gray-400 font-semibold">
-          {tokens[token].name!} - Price Evolution
-        </div>
-        <div className="text-xs text-gray-500 ml-2">Last 10 days</div>
-      </div>
+    <div className="w-[60%]">
       <ChartContainer config={chartConfig} className="pr-2">
         <AreaChart
           accessibilityLayer
@@ -272,47 +296,335 @@ const LineChart = (props: TokenPageProps) => {
 const Balance = (props: TokenPageProps) => {
   const router = useRouter();
   const { token } = props;
-  const { refreshBalance, balances } = useBalance();
-  const [totalBalanceUSD, setTotalBalanceUSD] = useState<string>("--.--");
+  const [txReceipt, setTxReceipt] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  const [userInputAmount, setUserInputAmount] = useState<string>("");
+  const [isBelowBalance, setIsBelowBalance] = useState(false);
+  const [isBelowAaveBalance, setIsBelowAaveBalance] = useState(false);
+
+  const { me, chain } = useMe();
+  const { refreshBalance } = useBalance();
 
   useEffect(() => {
-    const balance =
-      parseFloat(tokens[token].balance!) * parseFloat(tokens[token].rate!);
-    setTotalBalanceUSD(balance.toFixed(2));
-    const interval = setInterval(() => {
-      refreshBalance();
-    }, 50000);
-    return () => clearInterval(interval);
-  }, [balances, refreshBalance, token]);
+    if (txReceipt) {
+      const timer = setTimeout(() => {
+        setTxReceipt(null);
+        setError(null);
+        setUserInputAmount("");
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [txReceipt]);
+
+  function handleUserInputAmount(e: any, balance: string, aavebalance: string) {
+    const value = e.target.value;
+    const amount = Number(value);
+    if ((amount > Number(balance) && value !== "") || value === "") {
+      setIsBelowBalance(false);
+    }
+    if (amount <= Number(balance) && value !== "") {
+      setIsBelowBalance(true);
+    }
+    if ((amount > Number(aavebalance) && value !== "") || value === "") {
+      setIsBelowAaveBalance(false);
+    }
+    if (amount <= Number(aavebalance) && value !== "") {
+      setIsBelowAaveBalance(true);
+    }
+    if (amount === 0 || amount < 0) {
+      setIsBelowBalance(false);
+      setIsBelowAaveBalance(false);
+    }
+    setUserInputAmount(value);
+  }
+
+  function handleAmount(input: string, balance: string, aavebalance: string) {
+    const amount = Number(input);
+    if ((amount > Number(balance) && input !== "") || input === "") {
+      setIsBelowBalance(false);
+    }
+    if (amount <= Number(balance) && input !== "") {
+      setIsBelowBalance(true);
+    }
+    if ((amount > Number(aavebalance) && input !== "") || input === "") {
+      setIsBelowAaveBalance(false);
+    }
+    if (amount <= Number(aavebalance) && input !== "") {
+      setIsBelowAaveBalance(true);
+    }
+    if (amount === 0 || amount < 0) {
+      setIsBelowBalance(false);
+      setIsBelowAaveBalance(false);
+    }
+    setUserInputAmount(input);
+  }
+
+  function findContractKeyForToken(tokenKey: string): string | undefined {
+    // Extract the network from the token key
+    const tokenInfo = tokens[tokenKey];
+    if (!tokenInfo) {
+      console.error(`Token with key ${tokenKey} not found`);
+      return undefined;
+    }
+
+    const network = tokenInfo.network;
+
+    // Find the contract key that matches this network and includes the token
+    for (const contractKey in contracts) {
+      if (contractKey.endsWith(network)) {
+        const contract = contracts[contractKey];
+
+        // Check if the token is in the contract's tokenArray
+        if (contract.tokenArray && contract.tokenArray.includes(tokenKey)) {
+          return contractKey;
+        }
+      }
+    }
+
+    console.error(`No contract found for token ${tokenKey}`);
+    return undefined;
+  }
 
   return (
-    <div className="border w-[85%] rounded-xl">
-      <div className=" w-full h-[12vh] flex items-center justify-between px-4 py-2">
-        <div>
-          <h1 className="text-xl text-gray-400 font-semibold">Total Balance</h1>
-          <h1 className=" text-secondary font-semibold ml-1">
-            {tokens[token].balance} {tokens[token].coin}
-          </h1>
-        </div>
-        <h1 className="text-4xl font-medium flex items-center">
-          <div className="text-2xl text-gray-500 mr-[0.1rem]">$</div>
-          {totalBalanceUSD}
-        </h1>
-      </div>
-      <div className="border-t w-full h-[8vh] flex items-center justify-between">
-        <button
-          className="w-full h-full border-r text-lg text-secondary rounded-bl-xl hover:bg-secondary/20"
-          onClick={() => router.push(`/trade?from=${token}`)}
-        >
-          Sell
-        </button>
-        <button
-          className="w-full h-full text-lg text-primary rounded-br-xl hover:bg-primary/20"
-          onClick={() => router.push(`/trade?to=${token}`)}
-        >
-          Buy
-        </button>
-      </div>
+    <div className="max-w-[500px] w-full flex items-center justify-between border p-4">
+      <Drawer>
+        <DrawerTrigger>
+          <Button className="rounded-none">Stake / Unstake</Button>
+        </DrawerTrigger>
+        <DrawerContent className="max-w-[700px] w-full mx-auto py-5 px-4">
+          {error && !isLoading && (
+            <div className="w-full h-[60vh] flex items-center justify-center">
+              <div className="flex items-center">
+                <CircleX className="text-destructive mr-1" />
+                An error occurred! Please try again.
+              </div>
+            </div>
+          )}
+          {isLoading && (
+            <div className="flex h-[60vh] items-center justify-center">
+              <div className="flex items-center space-x-1">
+                <Spinner />
+                Sending Transaction...
+              </div>
+            </div>
+          )}
+          {txReceipt && !isLoading && !error && (
+            <div className="w-full h-[60vh] flex items-center justify-center">
+              {true ? (
+                <Button
+                  variant={"link"}
+                  onClick={() =>
+                    window.open(
+                      `${
+                        chains[tokens[token].network].viem.blockExplorers!
+                          .default.url
+                      }/tx/${txReceipt?.receipt?.transactionHash}`,
+                      "blank"
+                    )
+                  }
+                >
+                  <CircleCheckBig className="text-secondary mr-1" />
+                  Transaction Successful!
+                </Button>
+              ) : (
+                <Button
+                  variant={"link"}
+                  onClick={() =>
+                    window.open(
+                      `${
+                        chains[tokens[token].network].viem.blockExplorers!
+                          .default.url
+                      }/tx/${txReceipt?.receipt?.transactionHash}`,
+                      "blank"
+                    )
+                  }
+                >
+                  <CircleX className="text-destructive mr-1" />
+                  Transaction Failed!
+                </Button>
+              )}
+            </div>
+          )}
+          {!isLoading && !txReceipt && (
+            <div className="w-full h-[60vh] flex items-center justify-between space-y-4 flex-col">
+              <div className="pt-8 flex items-center flex-col w-full space-y-4">
+                <h1 className="text-2xl font-semibold">Supply / Withdraw</h1>
+              </div>
+              <div className="flex items-center justify-center relative">
+                <Image
+                  src={`/tokens-icons/${tokens[token].coin.toLowerCase()}.svg`}
+                  width={100}
+                  height={100}
+                  alt={tokens[token].coin}
+                />
+                <Image
+                  src={`/contracts-icons/${contracts[
+                    findContractKeyForToken(token)!
+                  ].name.toLowerCase()}.svg`}
+                  width={40}
+                  height={40}
+                  alt={contracts[
+                    findContractKeyForToken(token)!
+                  ].name.toLowerCase()}
+                  className="absolute bottom-0 left-0 transform -translate-x-1/4 translate-y-1/4"
+                />
+                <Image
+                  src={`/chains-icons/${
+                    chains[tokens[token].network].viem.name
+                  }.svg`}
+                  width={45}
+                  height={45}
+                  alt={contracts[
+                    findContractKeyForToken(token)!
+                  ].name.toLowerCase()}
+                  className="absolute bottom-0 right-0 transform translate-x-1/4 translate-y-1/4"
+                />
+              </div>
+              <div className="flex items-center justify-center space-x-8 w-full">
+                <Button
+                  className="bg-white flex flex-col items-center justify-center px-4 py-3 cursor-pointer rounded-none h-16"
+                  onClick={() =>
+                    handleAmount(
+                      formatBalance(tokens[token].balance!)!,
+                      tokens[token].balance!,
+                      tokens[token].aavebalance!
+                    )
+                  }
+                >
+                  <div className="font-semibold text-rose text-xs mx-2">
+                    Supplyable
+                  </div>
+                  <div className="flex flew-row text-rose">
+                    <h1 className="text-xl">
+                      {formatBalance(tokens[token].balance!)?.split(".")[0]}
+                    </h1>
+                    <h1 className="text-xs items-start pt-2">
+                      {formatBalance(tokens[token].balance!)?.split(".")[1] &&
+                        "." +
+                          formatBalance(tokens[token].balance!)!.split(".")[1]}
+                    </h1>
+                    <h1 className="text-sm pt-[0.375rem] ml-1">
+                      {tokens[token].coin}
+                    </h1>
+                  </div>
+                </Button>
+                <Button
+                  className="bg-white flex flex-col items-center justify-center px-4 rounded-none h-16"
+                  variant="noShadow"
+                >
+                  <div className="font-semibold text-xs ">APY</div>
+                  <div className="text-xl">12%</div>
+                </Button>
+                <Button
+                  className=" bg-white text-vertClair flex flex-col items-center justify-center px-4 py-3 rounded-none h-16"
+                  onClick={() =>
+                    handleAmount(
+                      formatBalance(tokens[token].aavebalance!)!,
+                      tokens[token].balance!,
+                      tokens[token].aavebalance!
+                    )
+                  }
+                >
+                  <div className="font-semibold text-xs">Withdrawable</div>
+                  <div className="flex flew-row">
+                    <h1 className="text-xl">
+                      {formatBalance(tokens[token].aavebalance!)?.split(".")[0]}
+                    </h1>
+                    <h1 className="text-xs items-start pt-2 ">
+                      {formatBalance(tokens[token].aavebalance!)?.split(
+                        "."
+                      )[1] &&
+                        "." +
+                          formatBalance(tokens[token].aavebalance!)!.split(
+                            "."
+                          )[1]}
+                    </h1>
+                    <h1 className=" text-sm pt-[0.375rem] ml-1">
+                      {tokens[token].coin}
+                    </h1>
+                  </div>
+                </Button>
+              </div>
+              {/* Input */}
+              <div className="relative">
+                <div className="absolute top-2 left-5 text-xs">
+                  Interact with
+                </div>
+                <Input
+                  className="h-[10vh] w-[30vw] text-4xl rounded-lg"
+                  placeholder="0"
+                  type="number"
+                  value={userInputAmount}
+                  onChange={(e) =>
+                    handleUserInputAmount(
+                      e,
+                      tokens[token].balance!,
+                      tokens[token].aavebalance!
+                    )
+                  }
+                />
+                <div className="flex space-x-1 items-center justify-center absolute top-1/2 right-4 -translate-y-1/2 text-2xl">
+                  <h1 className="text-primary/80 text-lg">
+                    {tokens[token].coin!}
+                  </h1>
+                  {isBelowBalance || isBelowAaveBalance ? (
+                    <CircleCheckBig className="text-secondary" />
+                  ) : userInputAmount === "" ? (
+                    <CircleX className="text-transparent" />
+                  ) : (
+                    <CircleX className="text-destructive/60" />
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-around w-full">
+                <Button
+                  onClick={async () =>
+                    setTxReceipt(
+                      await Supply(
+                        contracts[findContractKeyForToken(token)!],
+                        tokens[token],
+                        me!,
+                        userInputAmount,
+                        setIsLoading,
+                        refreshBalance,
+                        setError
+                      )
+                    )
+                  }
+                  className="w-40 text-lg rounded-none bg-white text-rose"
+                  disabled={!isBelowBalance}
+                >
+                  {isLoading ? <Spinner /> : "Supply"}
+                </Button>
+                <Button
+                  onClick={async () =>
+                    await Withdraw(
+                      contracts[findContractKeyForToken(token)!],
+                      tokens[token],
+                      me!,
+                      userInputAmount,
+                      setIsLoading,
+                      refreshBalance,
+                      setError
+                    )
+                  }
+                  className="w-40 text-lg rounded-none bg-white text-vertClair"
+                  disabled={!isBelowAaveBalance}
+                >
+                  {isLoading ? <Spinner /> : "Withdraw"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DrawerContent>
+      </Drawer>
+      <Button
+        className="rounded-none"
+        onClick={() => router.push(`/send?token=${token}`)}
+      >
+        Send
+      </Button>
     </div>
   );
 };

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { tokens, chains } from "@/constants";
 import { useMe } from "@/providers/MeProvider";
@@ -39,6 +40,15 @@ const Trade = () => {
 
   const { me, chain } = useMe();
   const { refreshBalance } = useBalance();
+
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
+
+  useEffect(() => {
+    if (token) {
+      setToken(token);
+    }
+  }, [token]);
 
   useEffect(() => {
     if (txReceipt) {
@@ -120,26 +130,8 @@ const Trade = () => {
     }
   }
 
-  async function handleSendTx() {
-    try {
-      const receipt = await SendTx(
-        tokens[Token],
-        me!,
-        inputAmount,
-        destinationAddress,
-        setIsLoading,
-        refreshBalance,
-        setError
-      );
-      setTxReceipt(receipt);
-    } catch (e) {
-      console.error(e);
-      setError(e);
-    }
-  }
-
   return (
-    <div className="h-full w-full flex items-center justify-center flex-col px-4">
+    <div className="h-full w-full flex items-center justify-center flex-col px-4 ">
       <div className="relative">
         <div className="absolute top-3 left-5 font-semibold text-card text-sm">
           Address
@@ -167,8 +159,8 @@ const Trade = () => {
           )}
         </div>
       </div>
-      <div className="p-[2px] rounded-full bg-background scale-[3] z-10">
-        <CircleChevronDown width={10} height={10} className="text-card/60" />
+      <div className="p-[2px] rounded-full bg-white scale-[3] z-10 border">
+        <CircleChevronDown width={10} height={10} className="" />
       </div>
       <div className="relative">
         <div className="absolute top-3 left-5 font-semibold text-card text-sm">
@@ -372,6 +364,7 @@ const Trade = () => {
       {!isLoading && !txReceipt && (
         <Button
           disabled={!inputAmount || !destinationAddress || !Token}
+          className="mt-4 rounded-none w-[6vw] text-lg"
           onClick={async () =>
             setTxReceipt(
               await await SendTx(

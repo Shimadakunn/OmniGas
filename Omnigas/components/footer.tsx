@@ -21,16 +21,23 @@ const Footer = () => {
   if (path === "/settings") return null;
   return (
     <footer className="w-full flex items-center justify-between h-[8vh] px-8 ">
-      <Button
+      {/* <Button
         variant={path === "/finance" ? "footer" : "ghost"}
         size={"sm"}
         onClick={() => router.push("/finance")}
       >
         <HandCoins className="mr-1" />
         {path === "/finance" ? "Finance" : ""}
-      </Button>
+      </Button> */}
       <div className=""></div>
-      <Image src={Logo} alt="logo" width={45} height={45} />
+      <div className=""></div>
+      <Image
+        src={Logo}
+        alt="logo"
+        width={45}
+        height={45}
+        onClick={() => router.push("/")}
+      />
     </footer>
   );
 };
