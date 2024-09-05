@@ -49,7 +49,7 @@ let chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const Token = () => {
+const Token = () => {
   const searchParams = useSearchParams();
 
   const token = searchParams.get("token") ?? "eth-sepolia";
