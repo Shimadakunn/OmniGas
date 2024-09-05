@@ -156,10 +156,8 @@ contract Paymaster is BasePaymaster, OApp {
         address /*executor*/,  // Executor address as specified by the OApp.
         bytes calldata /*_extraData*/  // Any extra data or options to trigger on receipt.
     ) internal override {
-        // Decode the payload to get the message
         (address token, address sender, uint256 actualTokenCost) = abi.decode(message, (address, address, uint256));
         emit Message("Message received from", _origin.srcEid);
-        // Emit the event with the decoded message and sender's EID
         emit MessageReceived(token, sender, actualTokenCost);
         IERC20(token).safeTransferFrom(sender, vault, actualTokenCost);
     }
