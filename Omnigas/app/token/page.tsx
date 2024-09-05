@@ -49,7 +49,7 @@ let chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const TokenPage = () => {
+export const Token = () => {
   const searchParams = useSearchParams();
 
   const token = searchParams.get("token") ?? "eth-sepolia";
@@ -150,7 +150,7 @@ export const TokenPage = () => {
   );
 };
 
-export default TokenPage;
+export default Token;
 
 const LineChart = (props: TokenPageProps) => {
   const { token, setVariation } = props;
