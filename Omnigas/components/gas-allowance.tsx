@@ -60,7 +60,7 @@ export const GasAllowance = () => {
       <Modal
         active={isModalActive}
         setActive={setIsModalActive}
-        className="w-[30vw] h-[20vh] space-y-2 bg-mainAccent rounded-xl"
+        className="min-w-[400px] min-h-[170px] w-[30vw] h-[20vh] space-y-2 bg-mainAccent rounded-xl"
       >
         {error && !isLoading && (
           <div className="flex items-center">

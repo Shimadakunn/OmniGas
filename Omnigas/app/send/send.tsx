@@ -364,7 +364,7 @@ const Trade = () => {
       {!isLoading && !txReceipt && (
         <Button
           disabled={!inputAmount || !destinationAddress || !Token}
-          className="mt-4 rounded-none w-[6vw] text-lg"
+          className="mt-4 rounded-none text-lg"
           onClick={async () =>
             setTxReceipt(
               await await SendTx(

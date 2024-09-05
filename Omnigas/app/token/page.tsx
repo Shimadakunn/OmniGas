@@ -25,7 +25,12 @@ import { formatBalance } from "@/utils/formatBalance";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import Spinner from "@/components/Spinner";
-import { CircleCheckBig, CircleX, CircleArrowOutUpRight } from "lucide-react";
+import {
+  CircleCheckBig,
+  CircleX,
+  HandCoins,
+  ChevronsRight,
+} from "lucide-react";
 
 export type TokenPageProps = {
   token: string;
@@ -232,7 +237,7 @@ const LineChart = (props: TokenPageProps) => {
   }, [refreshBalance, balances, token, setVariation]);
 
   return (
-    <div className="w-[60%]">
+    <div className="max-w-[1000px] w-full">
       <ChartContainer config={chartConfig} className="pr-2">
         <AreaChart
           accessibilityLayer
@@ -390,7 +395,10 @@ const Balance = (props: TokenPageProps) => {
     <div className="max-w-[500px] w-full flex items-center justify-between p-4">
       <Drawer>
         <DrawerTrigger>
-          <Button className="rounded-none text-lg">Stake / Unstake</Button>
+          <Button className="rounded-none text-lg">
+            Stake / Unstake
+            <HandCoins className="ml-2" />
+          </Button>
         </DrawerTrigger>
         <DrawerContent className="max-w-[700px] w-full mx-auto py-5 px-4">
           {error && !isLoading && (
@@ -517,7 +525,7 @@ const Balance = (props: TokenPageProps) => {
                   <div className="text-xl">12%</div>
                 </Button>
                 <Button
-                  className=" bg-white text-[#34eb89] flex flex-col items-center justify-center px-4 py-3 rounded-none h-16"
+                  className=" bg-white text-[#34ebcf] flex flex-col items-center justify-center px-4 py-3 rounded-none h-16"
                   onClick={() =>
                     handleAmount(
                       formatBalance(tokens[token].aavebalance!)!,
@@ -609,7 +617,7 @@ const Balance = (props: TokenPageProps) => {
                       setError
                     )
                   }
-                  className="w-40 text-lg rounded-none bg-white text-[#34eb89]"
+                  className="w-40 text-lg rounded-none bg-white text-[#34ebcf]"
                   disabled={!isBelowAaveBalance}
                 >
                   {isLoading ? <Spinner /> : "Withdraw"}
@@ -624,6 +632,7 @@ const Balance = (props: TokenPageProps) => {
         onClick={() => router.push(`/send?token=${token}`)}
       >
         Send
+        <ChevronsRight className="ml-2" />
       </Button>
     </div>
   );
