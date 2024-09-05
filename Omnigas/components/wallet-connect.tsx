@@ -100,7 +100,7 @@ const WalletConnect = () => {
       <Modal
         active={isModalActive}
         setActive={setIsModalActive}
-        className="w-[30vw] space-y-2 bg-mainAccent rounded-xl"
+        className="w-[30vw] space-y-2 bg-[#84A1E5] rounded-xl"
       >
         {success && wcReactSession && (
           <>
@@ -130,7 +130,7 @@ const WalletConnect = () => {
         {isLoading && <Spinner />}
         {!isLoading && !success && !error && !wcReactSession && (
           <>
-            <p className="text-2xl pb-2">Connect to a Dapp</p>
+            <p className="text-2xl pb-2 text-white">Connect to a Dapp</p>
             <div className="flex w-full space-x-4 items-center justify-center my-auto">
               <Input
                 className="w-[15vw] rounded-none"
@@ -144,7 +144,7 @@ const WalletConnect = () => {
                   setError(null);
                   handlePair(input);
                 }}
-                className="bg-[#DBCAF4]"
+                className="bg-rose"
               >
                 {isLoading ? "is connecting" : "Connect"}
               </Button>

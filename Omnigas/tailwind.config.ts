@@ -72,8 +72,14 @@ const config = {
         violetFonce: "#85A1E5",
         violetClair: "#DBCAF4",
 
-        up: "#FBC3DB",
-        down: "#FBC3DB",
+        up: {
+          DEFAULT: "hsl(var(--up))",
+          foreground: "hsl(var(--up-foreground))",
+        },
+        down: {
+          DEFAULT: "hsl(var(--down))",
+          foreground: "hsl(var(--down-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

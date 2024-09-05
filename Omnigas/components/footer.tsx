@@ -1,16 +1,6 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
-
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-
-import {
-  Home,
-  CircleChevronRight,
-  Scan,
-  ArrowRightLeft,
-  HandCoins,
-} from "lucide-react";
+import LayerZero from "@/public/layerZero.svg";
 
 import Logo from "@/public/logo.svg";
 import Image from "next/image";
@@ -29,7 +19,13 @@ const Footer = () => {
         <HandCoins className="mr-1" />
         {path === "/finance" ? "Finance" : ""}
       </Button> */}
-      <div className=""></div>
+      <Image
+        src={LayerZero}
+        alt="layer0"
+        width={120}
+        height={120}
+        className="pl-2"
+      />
       <div className=""></div>
       <Image
         src={Logo}

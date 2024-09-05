@@ -10,6 +10,8 @@ import Spinner from "@/components/Spinner";
 import Logo from "@/public/logo.svg";
 import Illustration1 from "@/public/illustrations/illustration1.svg";
 import Illustration2 from "@/public/illustrations/illustration2.svg";
+import LayerZero from "@/public/layerZero.svg";
+import LayerZeroB from "@/public/layerZeroBlack.svg";
 
 const Header = () => {
   return (
@@ -18,7 +20,7 @@ const Header = () => {
         <Image src={Logo} alt="logo" width={56} height={56} />
         <div className=" text-[64px]">OmniGas</div>
       </div>
-      <div className=""></div>
+      <Image src={LayerZeroB} alt="logo" width={250} height={250} />
     </header>
   );
 };
@@ -51,7 +53,9 @@ const Login = () => {
   return (
     <div className="w-full h-full flex items-center justify-center relative">
       <div className="flex flex-col items-center justify-center space-y-2 z-10">
-        <div className="text-4xl font-bold">Access to your Account</div>
+        <div className="text-4xl font-bold text-white">
+          Access to your Account
+        </div>
         {isLoading && <Spinner />}
 
         {!isLoading && (
@@ -73,17 +77,17 @@ const Login = () => {
               <div className="flex ">
                 <Input
                   placeholder="Username"
-                  className="w-[15vw] text-sm mr-1"
+                  className="w-[15vw] text-sm mr-1 rounded-sm"
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
                 />
-                <Button>CREATE</Button>
+                <Button className="rounded-sm">CREATE</Button>
               </div>
             )}
             {!createForm && (
-              <Button className="w-[10vw] rounded-xl">LOG IN</Button>
+              <Button className="w-[10vw] rounded-none">LOG IN</Button>
             )}
           </form>
         )}
@@ -104,6 +108,16 @@ const Login = () => {
             or log in with an existing passkey
           </div>
         )}
+      </div>
+      <div className="absolute bottom-0 -z-10 flex w-full items-center justify-center p-4">
+        <div className="text-sm">powered by</div>
+        <Image
+          src={LayerZero}
+          alt="layer0"
+          width={120}
+          height={120}
+          className="pl-2"
+        />
       </div>
     </div>
   );

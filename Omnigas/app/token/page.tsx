@@ -387,10 +387,10 @@ const Balance = (props: TokenPageProps) => {
   }
 
   return (
-    <div className="max-w-[500px] w-full flex items-center justify-between border p-4">
+    <div className="max-w-[500px] w-full flex items-center justify-between p-4">
       <Drawer>
         <DrawerTrigger>
-          <Button className="rounded-none">Stake / Unstake</Button>
+          <Button className="rounded-none text-lg">Stake / Unstake</Button>
         </DrawerTrigger>
         <DrawerContent className="max-w-[700px] w-full mx-auto py-5 px-4">
           {error && !isLoading && (
@@ -492,10 +492,10 @@ const Balance = (props: TokenPageProps) => {
                     )
                   }
                 >
-                  <div className="font-semibold text-rose text-xs mx-2">
+                  <div className="font-semibold text-[#eb34ab] text-xs mx-2">
                     Supplyable
                   </div>
-                  <div className="flex flew-row text-rose">
+                  <div className="flex flew-row text-[#eb34ab]">
                     <h1 className="text-xl">
                       {formatBalance(tokens[token].balance!)?.split(".")[0]}
                     </h1>
@@ -517,7 +517,7 @@ const Balance = (props: TokenPageProps) => {
                   <div className="text-xl">12%</div>
                 </Button>
                 <Button
-                  className=" bg-white text-vertClair flex flex-col items-center justify-center px-4 py-3 rounded-none h-16"
+                  className=" bg-white text-[#34eb89] flex flex-col items-center justify-center px-4 py-3 rounded-none h-16"
                   onClick={() =>
                     handleAmount(
                       formatBalance(tokens[token].aavebalance!)!,
@@ -592,7 +592,7 @@ const Balance = (props: TokenPageProps) => {
                       )
                     )
                   }
-                  className="w-40 text-lg rounded-none bg-white text-rose"
+                  className="w-40 text-lg rounded-none bg-white text-[#eb34ab]"
                   disabled={!isBelowBalance}
                 >
                   {isLoading ? <Spinner /> : "Supply"}
@@ -609,7 +609,7 @@ const Balance = (props: TokenPageProps) => {
                       setError
                     )
                   }
-                  className="w-40 text-lg rounded-none bg-white text-vertClair"
+                  className="w-40 text-lg rounded-none bg-white text-[#34eb89]"
                   disabled={!isBelowAaveBalance}
                 >
                   {isLoading ? <Spinner /> : "Withdraw"}
@@ -620,7 +620,7 @@ const Balance = (props: TokenPageProps) => {
         </DrawerContent>
       </Drawer>
       <Button
-        className="rounded-none"
+        className="rounded-none text-lg"
         onClick={() => router.push(`/send?token=${token}`)}
       >
         Send

@@ -176,7 +176,7 @@ export const GasAllowance = () => {
                     )
                   )
                 }
-                className="bg-[#DBCAF4]"
+                className="bg-rose"
               >
                 {isLoading ? "is adding" : "Add"}
               </Button>

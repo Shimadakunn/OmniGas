@@ -24,24 +24,26 @@ const Header = () => {
 
   return (
     <header className="w-full h-[10vh] flex items-center justify-between px-12 bg-white border-b-4 relative">
-      <Button
-        onClick={() => {
-          navigator.clipboard.writeText(me?.account || "");
-          setIsCopied(true);
-          setTimeout(() => setIsCopied(false), 1000);
-        }}
-        variant="reverse"
-      >
-        <UserRound className="mr-2" />
-        {me?.account.slice(0, 6)}...{me?.account.slice(-4)}
-      </Button>
-      <div className="font-[Gaeil] items-center space-x-4 hidden">
-        <Image src={Logo} alt="logo" width={45} height={45} />
-        <div className=" text-[56px]">OmniGas</div>
-      </div>
-      <div className="font-[Gaeil] flex items-center space-x-4 absolute right-1/2 top-1/2 translate-x-1/2 -translate-y-1/2">
-        <Image src={Logo} alt="logo" width={45} height={45} />
-        <div className=" text-[56px]">OmniGas</div>
+      <div className="flex items-center justify-center">
+        <Button
+          onClick={() => {
+            navigator.clipboard.writeText(me?.account || "");
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 1000);
+          }}
+          variant="reverse"
+        >
+          <UserRound className="mr-2" />
+          {me?.account.slice(0, 6)}...{me?.account.slice(-4)}
+        </Button>
+        <Image
+          src={Logo}
+          alt="logo"
+          width={40}
+          height={40}
+          className="ml-4 mr-1"
+        />
+        <div className=" text-[50px] font-[Gaeil]">OmniGas</div>
       </div>
       <div className="space-x-4 flex">
         <GasAllowance />
