@@ -166,9 +166,7 @@ const Finance = () => {
                   </div>
                   <Drawer>
                     <DrawerTrigger>
-                      <Button variant={"outline"} className="w-20">
-                        Interact
-                      </Button>
+                      <Button className="w-20">Interact</Button>
                     </DrawerTrigger>
                     <DrawerContent className="py-5 px-4 max-w-[600px]">
                       {error && !isLoading && (

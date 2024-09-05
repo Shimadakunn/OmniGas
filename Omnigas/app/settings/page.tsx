@@ -157,7 +157,6 @@ function FaucetCard({ token }: { token: string }) {
         </div>
       </div>
       <Button
-        variant={"outline"}
         size={"icon"}
         onClick={async () =>
           setTxReceipt(
