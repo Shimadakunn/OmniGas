@@ -18,12 +18,7 @@ const ChainSelector = () => {
       className="w-full max-w-sm px-2 h-[5vh]"
     >
       <CarouselContent className="space-x-4 px-4 border">
-        <Button
-          variant={chain === undefined ? "secondary" : "outline"}
-          onClick={() => switchChain(undefined)}
-        >
-          All
-        </Button>
+        <Button onClick={() => switchChain(undefined)}>All</Button>
         {Object.keys(chains).map((key) => (
           <Button
             key={key}
