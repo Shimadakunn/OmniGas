@@ -1,5 +1,4 @@
 import { User } from "./getUser";
-import { CHAIN } from "@/constants";
 import {
   Address,
   Hex,
@@ -20,57 +19,59 @@ export async function saveUser({
 }: {
   id: Hex;
   pubKey: { x: Hex; y: Hex };
-}): Promise<User| undefined> {
+}): Promise<User | undefined> {
   const account = privateKeyToAccount(
     process.env.NEXT_PUBLIC_RELAYER_PRIVATE_KEY as Hex
   );
 
-  const chainPromises = Object.entries(chains).map(async ([chainName, chainConfig]) => {
-    const chain = chainConfig.viem as Chain;
-    const relayerClient = createWalletClient({
-      account,
-      chain,
-      transport: http(),
-    });
-    const client = createPublicClient({
-      chain,
-      transport: http(),
-    });
+  const chainPromises = Object.entries(chains).map(
+    async ([chainName, chainConfig]) => {
+      const chain = chainConfig.viem as Chain;
+      const relayerClient = createWalletClient({
+        account,
+        chain,
+        transport: http(),
+      });
+      const client = createPublicClient({
+        chain,
+        transport: http(),
+      });
 
-    const user = await client.readContract({
-      address: process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS as Hex,
-      abi: FACTORY_ABI,
-      functionName: "getUser",
-      args: [BigInt(id)],
-    });
+      const user = await client.readContract({
+        address: process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS as Hex,
+        abi: FACTORY_ABI,
+        functionName: "getUser",
+        args: [BigInt(id)],
+      });
 
-    if (user.account !== zeroAddress) {
-      return [chainName, undefined];
+      if (user.account !== zeroAddress) {
+        return [chainName, undefined];
+      }
+
+      const pubKeyArray = [pubKey.x, pubKey.y] as const;
+      await relayerClient.writeContract({
+        address: process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS as Hex,
+        abi: FACTORY_ABI,
+        functionName: "saveUser",
+        args: [BigInt(id), pubKeyArray],
+      });
+
+      const smartWalletAddress = await client.readContract({
+        address: process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS as Hex,
+        abi: FACTORY_ABI,
+        functionName: "getAddress",
+        args: [pubKeyArray],
+      });
+
+      const createdUser = {
+        id,
+        account: smartWalletAddress,
+        pubKey,
+      };
+
+      return [chainName, createdUser];
     }
-
-    const pubKeyArray = [pubKey.x, pubKey.y] as const;
-    await relayerClient.writeContract({
-      address: process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS as Hex,
-      abi: FACTORY_ABI,
-      functionName: "saveUser",
-      args: [BigInt(id), pubKeyArray],
-    });
-
-    const smartWalletAddress = await client.readContract({
-      address: process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS as Hex,
-      abi: FACTORY_ABI,
-      functionName: "getAddress",
-      args: [pubKeyArray],
-    });
-
-    const createdUser = {
-      id,
-      account: smartWalletAddress,
-      pubKey,
-    };
-
-    return [chainName, createdUser];
-  });
+  );
 
   const results = await Promise.all(chainPromises);
   const undefinedUser = results.find(([, user]) => user === undefined);
@@ -85,5 +86,4 @@ export async function saveUser({
     const [, createdUser] = firstUser;
     return createdUser as User;
   }
-
 }
