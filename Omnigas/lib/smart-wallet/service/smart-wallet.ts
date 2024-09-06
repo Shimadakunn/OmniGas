@@ -45,7 +45,7 @@ export const createSmartWalletClient = (
 class SmartWallet {
   private _client: SmartWalletClient;
   private _isInitiated: boolean = true;
-  public feeToken: string = "";
+  public feeToken: string = "full";
 
   constructor() {
     this._client = createSmartWalletClient({
