@@ -100,7 +100,7 @@ const WalletConnect = () => {
       <Modal
         active={isModalActive}
         setActive={setIsModalActive}
-        className="min-w-[300px] w-[30vw] space-y-2 bg-[#84A1E5] rounded-xl"
+        className="min-w-[300px] w-[30vw] space-y-2 bg-mainAccent rounded-xl"
       >
         {success && wcReactSession && (
           <>
