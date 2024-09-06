@@ -319,10 +319,10 @@ const Trade = () => {
         </div>
       )}
       {isLoading && (
-        <div className="flex items-center space-x-1">
+        <>
           <Spinner />
-          Sending Transaction...
-        </div>
+          <span className="ml-1">Sending Transaction...</span>
+        </>
       )}
       {txReceipt && !isLoading && !error && (
         <div className="w-full flex items-center justify-center">

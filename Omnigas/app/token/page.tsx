@@ -607,14 +607,16 @@ const Balance = (props: TokenPageProps) => {
                 </Button>
                 <Button
                   onClick={async () =>
-                    await Withdraw(
-                      contracts[findContractKeyForToken(token)!],
-                      tokens[token],
-                      me!,
-                      userInputAmount,
-                      setIsLoading,
-                      refreshBalance,
-                      setError
+                    setTxReceipt(
+                      await Withdraw(
+                        contracts[findContractKeyForToken(token)!],
+                        tokens[token],
+                        me!,
+                        userInputAmount,
+                        setIsLoading,
+                        refreshBalance,
+                        setError
+                      )
                     )
                   }
                   className="w-40 text-lg rounded-none bg-white text-[#34ebcf]"
