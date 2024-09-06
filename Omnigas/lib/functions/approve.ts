@@ -51,6 +51,9 @@ export async function ApproveErc20(
       token.decimals!
     ).toString();
 
+    console.log("approvedWithdrawAmount", approvedWithdrawAmount);
+    console.log("paymaster", chains[token.network].paymaster);
+
     const calls = [
       {
         dest: token.address as Hex,

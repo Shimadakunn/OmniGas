@@ -75,7 +75,7 @@ export class UserOpBuilder {
   }
 
   async init(chain: ChainType) {
-    console.log("chain", chain);
+    console.log("Builder chain changed", chain);
     this.publicClient = createPublicClient({
       chain: chain.viem,
       transport: http(),
@@ -91,6 +91,7 @@ export class UserOpBuilder {
       walletClient,
       publicClient: this.publicClient,
     });
+    this.chain = chain.viem;
   }
 
   // reference: https://ethereum.stackexchange.com/questions/150796/how-to-create-a-raw-erc-4337-useroperation-from-scratch-and-then-send-it-to-bund
@@ -159,6 +160,8 @@ export class UserOpBuilder {
       BigInt(400_000) +
       BigInt(initCodeGas) +
       BigInt(2_000_000);
+
+    console.log("builder chain", this.chain);
 
     const chain = Object.entries(chains).find(
       ([_, chainType]) => chainType.viem === this.chain
