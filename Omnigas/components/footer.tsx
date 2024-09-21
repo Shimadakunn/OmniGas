@@ -19,13 +19,13 @@ const Footer = () => {
         <HandCoins className="mr-1" />
         {path === "/finance" ? "Finance" : ""}
       </Button> */}
-      <Image
+      {/* <Image
         src={LayerZero}
         alt="layer0"
         width={120}
         height={120}
         className="pl-2"
-      />
+      /> */}
       <div className=""></div>
       <Image
         src={Logo}
