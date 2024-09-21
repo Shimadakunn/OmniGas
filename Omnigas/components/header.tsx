@@ -43,7 +43,10 @@ const Header = () => {
           height={40}
           className="ml-4 mr-1"
         />
-        <div className=" text-[50px] font-[Gaeil]">OmniGas</div>
+        <div className=" text-[50px] font-[Gaeil]">
+          {/* OmniGas */}
+          Kuma
+        </div>
       </div>
       <div className="space-x-4 flex">
         <GasAllowance />

@@ -18,9 +18,12 @@ const Header = () => {
     <header className="flex items-center justify-between px-12 h-[15vh] bg-white border-b-4 absolute w-full z-10">
       <div className="font-[Gaeil] flex items-center space-x-4">
         <Image src={Logo} alt="logo" width={56} height={56} />
-        <div className=" text-[64px]">OmniGas</div>
+        <div className=" text-[64px]">
+          {/* OmniGas */}
+          Kuma
+        </div>
       </div>
-      <Image src={LayerZeroB} alt="logo" width={250} height={250} />
+      {/* <Image src={LayerZeroB} alt="logo" width={250} height={250} /> */}
     </header>
   );
 };
@@ -109,7 +112,7 @@ const Login = () => {
           </div>
         )}
       </div>
-      <div className="absolute bottom-0 -z-10 flex w-full items-center justify-center p-4">
+      {/* <div className="absolute bottom-0 -z-10 flex w-full items-center justify-center p-4">
         <div className="text-sm">powered by</div>
         <Image
           src={LayerZero}
@@ -118,7 +121,7 @@ const Login = () => {
           height={120}
           className="pl-2"
         />
-      </div>
+      </div> */}
     </div>
   );
 };
