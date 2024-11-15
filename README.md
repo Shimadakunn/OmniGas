@@ -6,7 +6,7 @@
 
 ![Login](https://github.com/user-attachments/assets/dffdbb25-e89f-4309-9ad1-50063216004d)
 
-# Smart Contracts
+# Smart Contracts (based on [Passkeys-4337](https://github.com/passkeys-4337/smart-wallet))
 ## Supported Chains
 - Optimism Sepolia
 - Arbitrum Sepolia
